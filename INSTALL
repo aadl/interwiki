@@ -1,0 +1,16 @@
+Pretty much the standard install.
+
+Load the SQL table.
+
+Note, you may want to edit the table to put whatever filters you want in.
+
+You might also want to grab the Media Wiki map
+http://meta.wikimedia.org/wiki/Interwiki_map
+
+The SQL table is the same table the Media Wiki uses.
+
+When the table is load, turn on the module
+(Admin ... modules ...)
+and enable the filter 
+(Admin ... input formats click on Configure to the right of which ever format
+ you want to use, and enable the MediaWiki filter)
