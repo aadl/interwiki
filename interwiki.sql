@@ -17,3 +17,4 @@ INSERT INTO interwiki values ('googledef','http://www.google.com/search?&q=defin
 INSERT INTO interwiki values ('dict','http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=$1',0);
 INSERT INTO interwiki values ('google','http://www.google.com/search?q=%22$2%22',0);
 INSERT INTO interwiki values ('ebay','http://search.ebay.com/$4',0);
+INSERT INTO interwiki values ('contact','http://contacts.smartcampaigns.com/index.php?title=$1',1);
