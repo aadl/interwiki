@@ -1,6 +1,6 @@
 This module makes it easy to link to wikis and other websites, using a simplified 
-syntax, e.g., "[prefix:some term]" creates a hyperlink to the "some term" article 
-on the website specified by "prefix." It is also possible to use the "|" character 
+"interwiki" syntax, e.g., "[prefix:some term]" creates a hyperlink to the "some term" 
+article on the website specified by "prefix." It is also possible to use the "|" character 
 to create a "piped link," with display text that is different from the search term.
 For example, "[w:public transport|public transportation]" would be translated as a 
 reference to the Wikipedia article on "public transport" that displays as:
@@ -10,12 +10,12 @@ reference to the Wikipedia article on "public transport" that displays as:
 To use this module, you have to take a few steps:
 
 * Install and enable the module in admin/modules, and load the "interwiki" 
-  table using file wmfilter.sql.
+  table using file interwiki.sql.
 
 * Set the appropriate access right in admin/user/configure/permission. 
-  The access right is "administer wmfilter."
+  The access right is "administer interwiki."
 
-* To add or edit new filters, use admin/wmfilter.
+* To add or edit new filters, use admin/interwiki.
 
 NOTE: The "interwiki" table used by this module has the same structure as the 
 interwiki table used by the MediaWiki software that powers Wikipedia and a number

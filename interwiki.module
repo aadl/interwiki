@@ -4,143 +4,200 @@
 /**
  * @file
  * An implementation of an input formatting module for a special non-html link 
- * syntax to Media Wiki
+ * syntax to wikis and other websites
  *
  * This module, when configured, is responsible for translating user-inputted links of the form
- * '[wm: some Subject]' into the form '<a href="http://www.wm.com/index.php/some_Subject>some Subject</a>'
- * where wm represents a Media Wiki key and http://www.wm.com/index.php is 
- * the path to the Media Wiki
+ * '[prefix:some term]' into the form '<a href="http://www.domain.com/some_term">some term</a>'
+ * where prefix represents a key and http://www.domain.com/ is 
+ * the path to the an article about the term
  */
-
-
 
 /**
  * Implementation of hook_help().
  */
-function wmfilter_help($section) {
+function interwiki_help($section) {
   switch ($section) {
     case 'admin/modules#description':
       return t('Easily link to wikis and other websites.');
-    case 'admin/help#wmfilter':
+    case 'admin/help#interwiki':
       return t("<p>When enabled, this module makes it easy to link to wikis and other websites, using a simplified syntax, e.g., \"[prefix:some term]\" creates a hyperlink to the ".
-	              "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
-				  "different from the search term. For example, \"[w:public transport|public transportation]\" would be translated as a reference to the Wikipedia article on \"public ".
-				  "transport\" that displays as \"<a href=\"http://en.wikipedia.org/wiki/public_transport\">public transportation</a>.\"</p>\n".
-                  "<h3>Configuration</h3><p>To use this module, you have to take a few steps:</p>".
-				  "<ul><li>Install and enable the module in %modules, and create the \"interwiki\" table using file wmfilter.sql.</li>".
-				  "<li>Set the appropriate access right in %access<br />The access right is <b>administer wmfilter</b>.</li>".
-				  "<li>To add or edit new filters, use %wmfilters.</li></ul>",
-                  array(
-				     '%modules' => l(t("administer &raquo; modules"), "admin/modules"), 
-                     '%access' => l(t("administer &raquo; users &raquo; configure &raquo; permissions"), "admin/user/configure/permission"),				  
-                     '%wmfilters' => l(t("administer &raquo; wmfilter"), "admin/wmfilter")				  
-				  ));
+          "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
+          "different from the search term. For example, \"[w:public transport|public transportation]\" would be translated as a reference to the Wikipedia article on \"public ".
+          "transport\" that displays as \"<a href=\"http://en.wikipedia.org/wiki/public_transport\">public transportation</a>. In addition to the single bracket syntax,
+          a double bracket syntax like the one used by %MediaWiki can be chosen from the interwiki configuration in %settings.\"</p>\n".
+          "<h3>Configuration</h3><p>To use this module, you have to take a few steps:</p>".
+          "<ul><li>Install and enable the module in %modules, and create the \"interwiki\" table using file interwiki.sql.</li>".
+          "<li>Set the appropriate access right in %access<br />The access right is <b>administer interwiki</b>.</li>".
+          "<li>To add or edit new filters, use %interwikis.</li></ul>",
+          array(
+            '%MediaWiki' => '<a href="http://wikipedia.sourceforge.net/">MediaWiki</a>', 
+            '%settings' => l(t("administer &raquo; filters"), "admin/filters"), 
+            '%modules' => l(t("administer &raquo; modules"), "admin/modules"), 
+            '%access' => l(t("administer &raquo; users &raquo; configure &raquo; permissions"), "admin/user/configure/permission"),				  
+            '%interwikis' => l(t("administer &raquo; interwiki"), "admin/interwiki")				  
+          ));
   }
 }
 
 /**
- * hook_perm: Define user permissions for module wmfilter
+ * hook_perm: Define user permissions for module interwiki
  * 
  *   - access content: User can view the list of available filters
- *   - administer wmfilter: User can edit or add to the list of filters
+ *   - administer interwiki: User can edit or add to the list of filters
  *
  * @note See hook_perm() for a description of parameters and return values.
  */
-function wmfilter_perm() {
-  return array('administer wmfilter');
+function interwiki_perm() {
+  return array('administer interwiki');
 }
+
+/**
+ * Implementation of hook_settings().
+ */
+/* 
+function interwiki_settings() {
+  $syntax = array('single' => 'Single brackets, e.g., [prefix:some term]', 'double' => 'Double brackets, e.g., [[prefix:some term]]');
+  return form_checkboxes(t('Syntax'), 'interwiki_syntax', variable_get('interwiki_syntax', array('single')), $syntax, t('The syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)'));
+}
+*/
 
 /**
  * Implementation of hook_menu().
  */
-function wmfilter_menu($may_cache) {
+function interwiki_menu($may_cache) {
   $items = array();
   if ($may_cache) {
-    $items[] = array('path' => 'wmfilter',
+    $items[] = array('path' => 'interwiki',
 	  'title' => t('wiki filter prefixes'),
       'access' => TRUE,
-      'callback' => 'wmfilter_list',
+      'callback' => 'interwiki_list',
       'type' => MENU_CALLBACK);
-    $items[] = array('path' => 'admin/wmfilter',
-	  'title' => t('wmfilter'),
-      'access' => user_access('administer wmfilter'),
-      'callback' => 'wmfilter_admin');
-    $items[] = array('path' => 'admin/wmfilter/list',
+    $items[] = array('path' => 'admin/interwiki',
+	  'title' => t('interwiki'),
+      'access' => user_access('administer interwiki'),
+      'callback' => 'interwiki_admin');
+    $items[] = array('path' => 'admin/interwiki/list',
 	  'title' => t('list'),
-      'access' => user_access('administer wmfilter'),
-      'callback' => 'wmfilter_admin',
+      'access' => user_access('administer interwiki'),
+      'callback' => 'interwiki_admin',
       'type' => MENU_DEFAULT_LOCAL_TASK,
 	  'weight' => -10 );
-    $items[] = array('path' => 'admin/wmfilter/add',
+    $items[] = array('path' => 'admin/interwiki/add',
 	  'title' => t('add'),
-      'access' => user_access('administer wmfilter'),
-      'callback' => 'wmfilter_admin',
+      'access' => user_access('administer interwiki'),
+      'callback' => 'interwiki_admin',
       'type' => MENU_LOCAL_TASK);
   }
   return $items;
 }
 
 /**
- * List wm filters.
+ * List interwiki filter prefixes.
  */
-function wmfilter_list() {
-      $output = t('Easily link to terms in various wiki-based sites by typing [prefix:term]<p>');
-
-      $result = db_query("SELECT iw_prefix, iw_url from {interwiki}");
-	  $header = array(t('Prefix'), t('Translates to'));
-      while ($record = db_fetch_object($result)) {
-         // Strip out $1 from Media Wiki tables ...
-         $url = preg_replace( '/\$1/', '', $record->iw_url);
-         $rows[] = array ($record->iw_prefix . ":", $url);
-      }
-      $output .= t('Available prefixes are:') . '<p>';
-      $output .= theme('table',$header,$rows);
-	  print theme("page", $output);
+function interwiki_list() {
+  $format = arg(1);
+  $syntax = variable_get("interwiki_syntax_$format", array('single'));
+  if ((array_search('double', $syntax) === FALSE) || !(array_search('single', $syntax) === FALSE)) {
+    $unpiped = t('[prefix:some term]');
+    $piped   = t('[w:public transport|public transportation]');
+  } else {
+    $unpiped = t('[[prefix:some term]]');
+    $piped   = t('[[w:public transport|public transportation]]');
+  }
+  $output = t("<p>You can easily link to terms in wikis and various other websites using a simplified markup syntax. For example, \"%unpiped\" creates a hyperlink to the ".
+      "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
+      "different from the search term. For example, \"%piped\" would be translated as a reference to the Wikipedia article on \"public ".
+      "transport\" that displays as \"<a href=\"http://en.wikipedia.org/wiki/public_transport\">public transportation</a>.\"</p>",
+      array(
+        '%unpiped' => $unpiped, 
+        '%piped' => $piped				  
+        ));
+  $result = db_query("SELECT iw_prefix, iw_url from {interwiki}");
+  $header = array(t('Prefix'), t('Translates to'));
+  while ($record = db_fetch_object($result)) {
+    // Strip out $1, $2, $3 and $4 from interwiki tables ...
+    $url = preg_replace(array('/\$1/', '/\$2/', '/\$3/', '/\$4/'), '', $record->iw_url);
+	if ($url == '') {
+	  $url = t('<i>a local path on this website</i>');
+	}
+    $rows[] = array ($record->iw_prefix . ":", $url);
+  }
+  $output .= t('Available prefixes are:') . '<p>';
+  $output .= theme('table',$header,$rows);
+  print theme("page", $output);
 }
 
 /**
  * Implementation of hook_filter().
  */
-function wmfilter_filter($op, $delta = 0, $format = -1, $text = '') {
+function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
   switch ($op) {
     case 'list':
-      return array(0 => t('MediaWiki Filter'));
+      return array(0 => t('Interwiki filter'));
 
     case 'description':
-      return t('Easily link to Media Wiki sites'); 
+      return t('Easily link to wikis and other reference websites'); 
 
     case 'process':
       $result = db_query("SELECT iw_prefix, iw_url, iw_local from {interwiki}");
-	  $targets = array();
+      $targets = array();
       while ($record = db_fetch_object($result)) {
-         $matcha[$record->iw_prefix] = $record->iw_url;
-		 $targets[$record->iw_prefix] = $record->iw_local ? '_self' : '_blank';
+        $matcha[$record->iw_prefix] = $record->iw_url;
+        $targets[$record->iw_prefix] = $record->iw_local ? '_self' : '_blank';
       }
-
-      if (preg_match_all('/\[([^]]+)?:([^]]+)?\]/i', $text, $match)) {
-        $index = 0;
-        foreach($match[0] as $pattern_matched) {
-          if (! ($matcha[$match[1][$index]] == "")) {
-            $target = $targets[$match[1][$index]];
-            $term = trim($match[2][$index]);
-			$term_array = explode('|',$term, 2);
-			$term = $term_array[0];
-			$display_term = $term_array[1] ? $term_array[1] : $term;
-            $url_term1 = preg_replace('/\ /', '_', $term);
-            $url_term2 = preg_replace('/\ /', '+', $term);
-            $url_term3 = preg_replace('/\ /', '%20', $term);
-            $url_term4 = preg_replace('/\ /', '-', $term);
-			$url = preg_replace(array('/\$1/','/\$2/', '/\$3/', '/\$4/'), array($url_term1, $url_term2, $url_term3, $url_term4), $matcha[$match[1][$index]]);
-            $html = '<a href="' . $url .'" title="Media Wiki reference on '. $term .'" target="'. $target .'">'. $display_term .'</a>';
-            $text = str_replace($pattern_matched, $html, $text);
+      $syntax = variable_get("interwiki_syntax_$format", array('single'));
+      if (!(array_search('double', $syntax) === FALSE)) {
+        $pregs[] = '/\[\[([^]:]+)?:([^]]+)?\]\]/i';
+      }
+      if (!(array_search('single', $syntax) === FALSE) || (array_search('double', $syntax) === FALSE)) {
+        $pregs[] = '/\[([^]:]+)?:([^]]+)?\]/i';
+      }
+      foreach ($pregs as $preg) {
+        if (preg_match_all($preg, $text, $match)) {
+          $index = 0;
+          foreach($match[0] as $pattern_matched) {
+            if (! ($matcha[$match[1][$index]] == "")) {
+              $target = $targets[$match[1][$index]];
+              $term = trim($match[2][$index]);
+              $term_array = explode('|',$term, 2);
+              $term = $term_array[0];
+              $display_term = $term_array[1] ? $term_array[1] : $term;
+              $url_term1 = preg_replace('/\ /', '_', $term);
+              $url_term2 = preg_replace('/\ /', '+', $term);
+              $url_term3 = preg_replace('/\ /', '%20', $term);
+              $url_term4 = preg_replace('/\ /', '-', $term);
+              $url = preg_replace(array('/\$1/','/\$2/', '/\$3/', '/\$4/'), array($url_term1, $url_term2, $url_term3, $url_term4), $matcha[$match[1][$index]]);
+              $html = '<a href="' . $url .'" title="reference on '. $term .'" target="'. $target .'">'. $display_term .'</a>';
+              $text = str_replace($pattern_matched, $html, $text);
+            }
+            $index++;
           }
-          $index++;
         }
-        return $text;
       }
-      else { 
-        return $text; 
+      return $text; 
+
+    case 'settings':
+      $syntax = variable_get("interwiki_syntax_$format", array('single'));
+      if ((array_search('double', $syntax) === FALSE) || !(array_search('single', $syntax) === FALSE)) {
+        $unpiped = t('[prefix:term]');
+        $piped   = t('[w:public transport|public transportation]');
+      } else {
+        $unpiped = t('[[prefix:term]]');
+        $piped   = t('[[w:public transport|public transportation]]');
       }
+      $output = t('The interwiki filter is enabled. You can easily link to terms in various wikis or other websites by typing %unpiped. ' . 
+          'Use the "|" character to create a "piped link," e.g., "%piped" '.
+          'displays as "<a href="http://en.wikipedia.org/wiki/public_transport">public transportation</a>." '.
+          'For a full list of available prefixes and the websites to which they point, see %prefixes.',
+          array(
+            '%unpiped' => $unpiped,
+            '%piped' => $piped,
+            '%prefixes' => l('interwiki', "interwiki/$format")
+            ));
+
+      $syntax = array('single' => 'Single brackets, e.g., [prefix:some term]', 'double' => 'Double brackets, e.g., [[prefix:some term]]');
+      $output .= form_checkboxes(t('Syntax'), "interwiki_syntax_$format", variable_get("interwiki_syntax_$format", array('single')), $syntax, t('Check the boxes above to select the syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)'));
+      return form_group(t('interwiki'), $output);
 
     default:
       return $text;
@@ -150,16 +207,30 @@ function wmfilter_filter($op, $delta = 0, $format = -1, $text = '') {
 /**
  * Implementation of hook_filter_tips().
  */
-function wmfilter_filter_tips($delta, $format, $long = false) {
-  return t('Easily link to terms in various wiki-based sites by typing [prefix:term]. ') . 
-      'Use the "|" character to create a "piped link," e.g., "[w:public transport|public transportation]" '.
-      'displays as "<a href="http://en.wikipedia.org/wiki/public_transport">public transportation</a>." ' . l(t('See list of available prefixes.'),'wmfilter');
+function interwiki_filter_tips($delta, $format, $long = false) {
+  $syntax = variable_get("interwiki_syntax_$format", array('single'));
+  if ((array_search('double', $syntax) === FALSE) || !(array_search('single', $syntax) === FALSE)) {
+    $unpiped = t('[prefix:term]');
+    $piped   = t('[w:public transport|public transportation]');
+  } else {
+    $unpiped = t('[[prefix:term]]');
+    $piped   = t('[[w:public transport|public transportation]]');
+  }
+  return t('Easily link to terms in various wikis or other websites by typing %unpiped. ' . 
+      'Use the "|" character to create a "piped link," e.g., "%piped" '.
+      'displays as "<a href="http://en.wikipedia.org/wiki/public_transport">public transportation</a>." '.
+      'For a full list of available prefixes and the websites to which they point, see %prefixes.',
+      array(
+        '%unpiped' => $unpiped,
+        '%piped' => $piped,
+        '%prefixes' => l('interwiki', "interwiki/$format")
+        ));
 }
 
 /**
  * Return a single filter from the database.
  */
-function wmfilter_get($iw_prefix) {
+function interwiki_get($iw_prefix) {
   return db_fetch_array(db_query("SELECT * FROM {interwiki} WHERE iw_prefix = '%s'", $iw_prefix));
 }
 
@@ -167,12 +238,12 @@ function wmfilter_get($iw_prefix) {
  * Display an editing form for adding or changing an individual filter.
  *
  */
-function wmfilter_form($edit = array()) {
+function interwiki_form($edit = array()) {
   $form .= form_textfield(t("Prefix"), "iw_prefix", $edit["iw_prefix"], 32, 32, t("The prefix goes before a colon when users edit content, e.g., \"[prefix:some text].\""));
   $form .= form_textfield(t("URL"), "iw_url", $edit["iw_url"], 50, 128, t('The URL to be created. The phrase "some_text" will replace the string "$1" in the translated hyperlink, "some+text" will replace "$2", "some%20text" will replace "$3", and "some-text" will replace "$4".'));
   $form .= form_checkbox(t("Local?"), "iw_local", 1, $edit["iw_local"], t("Is this link local to your website? Non-local links will open in a new window."));
   $form .= form_submit(t("Submit"));
-  
+
   if ($edit["iw_url"]) {
     $form .= form_submit(t("Delete"));
   }
@@ -184,7 +255,7 @@ function wmfilter_form($edit = array()) {
  * Update, insert or delete a filter from the database.
  *
  */
-function wmfilter_save($edit) {
+function interwiki_save($edit) {
   db_query("DELETE FROM {interwiki} WHERE iw_prefix = '%s'", $edit["iw_prefix"]);
   if ($edit["iw_url"]) {
     db_query("INSERT INTO {interwiki} (iw_prefix, iw_url, iw_local) VALUES  ('%s', '%s', '%d')", $edit["iw_prefix"], $edit["iw_url"], $edit["iw_local"]);
@@ -195,24 +266,23 @@ function wmfilter_save($edit) {
  * Display the list of filters for editing purposes.
  *
  */
-function wmfilter_display() {
-      $output = t('Easily link to terms in various wiki-based sites by typing [prefix:term].<p>');
-
-      $result = db_query("SELECT iw_prefix, iw_url, iw_local from {interwiki}");
-	  $header = array(t('Prefix'), t('Translates to'), t('Local?'), array("data" => t("operations"), "colspan" => 2));
-      while ($record = db_fetch_object($result)) {
-         $rows[] = array ($record->iw_prefix . ":", $record->iw_url, ($record->iw_local ? 'Yes' : 'No'), l(t("edit"), "admin/wmfilter/edit/$record->iw_prefix"), l(t("delete"), "admin/wmfilter/delete/$record->iw_prefix"));
-      }
-      $output .= 'Available prefixes are:<p>';
-      $output .= theme('table',$header,$rows);
-	  return $output;
+function interwiki_display() {
+  $output = t("<p>The interwiki table lets website users easily link to terms in wikis and various other websites using a simplified markup syntax. For example, \"[prefix:some term]\" creates a hyperlink to the ".
+      "\"some term\" article on the website specified by \"prefix.\" Available prefixes and the paths to which they point are:</p>");
+  $result = db_query("SELECT iw_prefix, iw_url, iw_local from {interwiki}");
+  $header = array(t('Prefix'), t('Translates to'), t('Local?'), array("data" => t("operations"), "colspan" => 2));
+  while ($record = db_fetch_object($result)) {
+    $rows[] = array ($record->iw_prefix . ":", $record->iw_url, ($record->iw_local ? 'Yes' : 'No'), l(t("edit"), "admin/interwiki/edit/$record->iw_prefix"), l(t("delete"), "admin/interwiki/delete/$record->iw_prefix"));
+  }
+  $output .= theme('table',$header,$rows);
+  return $output;
 }
 
 /**
  * Route all requests to administer the filters.
  *
  */
-function wmfilter_admin() {
+function interwiki_admin() {
   $op = $_POST["op"];
   $edit = $_POST["edit"];
 
@@ -222,22 +292,24 @@ function wmfilter_admin() {
 
   switch ($op) {
     case "add":
-      $output = wmfilter_form();
+      $output = interwiki_form();
       break;
+
     case "edit":
-      $output = wmfilter_form(wmfilter_get(arg(3)));
+      $output = interwiki_form(interwiki_get(arg(3)));
       break;
-	case "delete": // the lower-case "d" in "delete" indicates that this came from a URL, so there's no $_POST variable and therefore no $edit
-	  $edit = wmfilter_get(arg(3));
+
+    case "delete": // the lower-case "d" in "delete" indicates that this came from a URL, so there's no $_POST variable and therefore no $edit
+      $edit = interwiki_get(arg(3));
       // fall through:
     case t("Delete"): // the upper-case "D" indicates that this came from the editing form, so there is a $_POST variable but no arg(3)
       $edit["iw_url"] = '';
       // fall through:
     case t("Submit"):
-      $output = wmfilter_save($edit);
+      $output = interwiki_save($edit);
       // fall through:
     default:
-      $output .= wmfilter_display();
+      $output .= interwiki_display();
   }
 
   print theme('page', $output);
