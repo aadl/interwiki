@@ -10,6 +10,7 @@ CREATE TABLE interwiki (
 INSERT INTO interwiki values ('kos','http://www.dkosopedia.com/index.php/$1',0);
 INSERT INTO interwiki values ('w','http://en.wikipedia.org/wiki/$1',0);
 INSERT INTO interwiki values ('dis','http://www.disinfopedia.org/wiki.phtml?title=$1',0);
+INSERT INTO interwiki values ('pp','http://www.progressivepunch.org/export/plugin?profile=blog&searchString=$1',0);
 INSERT INTO interwiki values ('http','http:$1',0);
 INSERT INTO interwiki values ('','$1',1);
 INSERT INTO interwiki values ('googledef','http://www.google.com/search?&q=define:$1',0);
