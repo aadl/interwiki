@@ -21,9 +21,6 @@ function wmfilter_help($section) {
   switch ($section) {
     case 'admin/modules#description':
       return t('Easily link to wikis and other websites.');
-/*    case 'admin/settings/wmfilter':
-      return t("Settings for links to wikis and other websites.");
-*/
     case 'admin/help#wmfilter':
       return t("<p>When enabled, this module makes it easy to link to wikis and other websites, using a simplified syntax, e.g., \"[prefix:some term]\" creates a hyperlink to the ".
 	              "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
@@ -121,7 +118,6 @@ function wmfilter_filter($op, $delta = 0, $format = -1, $text = '') {
       }
 
       if (preg_match_all('/\[([^]]+)?:([^]]+)?\]/i', $text, $match)) {
-//        $target = variable_get('wmfilter_new_window', '_self');
         $index = 0;
         foreach($match[0] as $pattern_matched) {
           if (! ($matcha[$match[1][$index]] == "")) {
@@ -130,8 +126,11 @@ function wmfilter_filter($op, $delta = 0, $format = -1, $text = '') {
 			$term_array = explode('|',$term, 2);
 			$term = $term_array[0];
 			$display_term = $term_array[1] ? $term_array[1] : $term;
-            $url_term = preg_replace('/\ /', '_', $term);
-			$url = preg_replace( '/\$1/', $url_term, $matcha[$match[1][$index]]);
+            $url_term1 = preg_replace('/\ /', '_', $term);
+            $url_term2 = preg_replace('/\ /', '+', $term);
+            $url_term3 = preg_replace('/\ /', '%20', $term);
+            $url_term4 = preg_replace('/\ /', '-', $term);
+			$url = preg_replace(array('/\$1/','/\$2/', '/\$3/', '/\$4/'), array($url_term1, $url_term2, $url_term3, $url_term4), $matcha[$match[1][$index]]);
             $html = '<a href="' . $url .'" title="Media Wiki reference on '. $term .'" target="'. $target .'">'. $display_term .'</a>';
             $text = str_replace($pattern_matched, $html, $text);
           }
@@ -143,21 +142,6 @@ function wmfilter_filter($op, $delta = 0, $format = -1, $text = '') {
         return $text; 
       }
 
-/*    case 'settings':
-      $output = t('Easily link to terms in various wiki-based sites by typing [prefix:term]<p>');
-
-      $result = db_query("SELECT iw_prefix, iw_url from {interwiki}");
-	  $header = array(t('Prefix'), t('Translates to'));
-      while ($record = db_fetch_object($result)) {
-         // Strip out $1 from Media Wiki tables ...
-         $url = preg_replace( '/\$1/', '', $record->iw_url);
-         $rows[] = array ($record->iw_prefix . ":", $url);
-      }
-      $output .= t('Available prefixes are:') . '<p>';
-      $output .= theme('table',$header,$rows);
-      $output .= form_radios(t('Reference links open in'), 'wmfilter_new_window', variable_get('wmfilter_new_window', '_self'), array('_blank' => 'New Window', '_self' => 'Same Window'));
-      return form_group(t('Media Wiki Filter'), $output);
-*/
     default:
       return $text;
   }
@@ -185,7 +169,7 @@ function wmfilter_get($iw_prefix) {
  */
 function wmfilter_form($edit = array()) {
   $form .= form_textfield(t("Prefix"), "iw_prefix", $edit["iw_prefix"], 32, 32, t("The prefix goes before a colon when users edit content, e.g., \"[prefix:some text].\""));
-  $form .= form_textfield(t("URL"), "iw_url", $edit["iw_url"], 50, 128, t('The URL to be created. The phrase "some_text" will replace the string "$1" in the translated hyperlink.'));
+  $form .= form_textfield(t("URL"), "iw_url", $edit["iw_url"], 50, 128, t('The URL to be created. The phrase "some_text" will replace the string "$1" in the translated hyperlink, "some+text" will replace "$2", "some%20text" will replace "$3", and "some-text" will replace "$4".'));
   $form .= form_checkbox(t("Local?"), "iw_local", 1, $edit["iw_local"], t("Is this link local to your website? Non-local links will open in a new window."));
   $form .= form_submit(t("Submit"));
   
