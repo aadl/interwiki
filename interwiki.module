@@ -167,10 +167,10 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
 
     case 'process':
       $result = db_query("SELECT iw_prefix, iw_url, iw_local from {interwiki}");
-	  $targets = array();
+      $targets = array();
       while ($record = db_fetch_object($result)) {
          $matcha[$record->iw_prefix] = $record->iw_url;
-		 $targets[$record->iw_prefix] = $record->iw_local ? '_self' : '_blank';
+         $targets[$record->iw_prefix] = $record->iw_local ? '_self' : '_blank';
       }
       $syntax = variable_get("interwiki_syntax_$format", array('single'));
       if (!(array_search('double', $syntax) === FALSE)) {
@@ -179,21 +179,22 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       if (!(array_search('single', $syntax) === FALSE) || (array_search('double', $syntax) === FALSE)) {
         $pregs[] = '/\[([^]:]+)?:([^]]+)?\]/i';
       }
-	  foreach ($pregs as $preg) {
+      foreach ($pregs as $preg) {
         if (preg_match_all($preg, $text, $match)) {
           $index = 0;
           foreach($match[0] as $pattern_matched) {
             if (! ($matcha[$match[1][$index]] == "")) {
-			  if ($match[1][$index] == 'http') {
-			    $display_prefix = $match[1][$index] . ':';
-			  } else {
-			    $display_prefix = '';
-			  }
+              // a prefix of 'http' is a special case where the prefix ought to display if no separate display term is specified
+              if ($match[1][$index] == 'http') {
+                $display_prefix = $match[1][$index] . ':';
+              } else {
+                $display_prefix = '';
+              }
               $target = $targets[$match[1][$index]];
               $term = trim($match[2][$index]);
-			  $term_array = explode('|',$term, 2);
+              $term_array = explode('|',$term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
-              $url_term = preg_replace('/\&/', '%26', $term_array[0]);
+              $url_term = $display_prefix ? $term_array[0] : preg_replace('/\&/', '%26', $term_array[0]); // if the prefix is 'http', don't fix ampersands
               $url_term1 = preg_replace('/\ /', '_', $url_term);
               $url_term2 = preg_replace('/\ /', '+', $url_term);
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
