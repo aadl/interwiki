@@ -1,3 +1,5 @@
+-- $Id$
+
 CREATE TABLE interwiki (
   iw_prefix char(32) NOT NULL,
   iw_url char(127) NOT NULL,
