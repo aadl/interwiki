@@ -9,5 +9,24 @@ Wikipedia has an article with further information about interwikis, which
 can be found at:
 http://en.wikipedia.org/wiki/Interwiki
 
+The file "interwiki.sql," which comes with this module, includes a number
+of table entries that facilitate creating links to articles on websites including
+the following:
+
+  PREFIX      SITE
+  ------      ----
+  w           Wikipedia (the online, open source encyclopedia)
+  sw          SourceWatch (a wiki-based encyclopedia of lobbyists, PR firms,
+                think tanks and other political advocacy groups)
+  kos         dKosopedia (a wiki affiliated with the Daily Kos website)
+  ebay        eBay
+  google      Google web search
+  googledef   Google definitions
+  dict        Merriam-Webster's Dictionary online
+  th          an online thesaurus
+  archive     the Internet Archive (displays old versions of websites)
+  whois       an Internic search for whois information about a domain name
+  opendir     the Open Directory project (a human-edited web search engine)                                                                                                                                                                                                                                                                                                                                                        
+
 Questions?
 Contact Aldon Hynes <ahynes1@optonline.net> or Sheldon Rampton <sheldon@prwatch.org>.
