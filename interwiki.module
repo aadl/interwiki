@@ -58,7 +58,7 @@ function wmfilter_menu($may_cache) {
   if ($may_cache) {
     $items[] = array('path' => 'wmfilter',
 	  'title' => t('wiki filter prefixes'),
-      'access' => user_access('access content'),
+      'access' => TRUE,
       'callback' => 'wmfilter_list',
       'type' => MENU_CALLBACK);
     $items[] = array('path' => 'admin/wmfilter',
