@@ -193,13 +193,13 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $term = trim($match[2][$index]);
 			  $term_array = explode('|',$term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
-              $url_term = preg_replace('/\&/', '%26', $term);
+              $url_term = preg_replace('/\&/', '%26', $term_array[0]);
               $url_term1 = preg_replace('/\ /', '_', $url_term);
               $url_term2 = preg_replace('/\ /', '+', $url_term);
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
               $url_term4 = preg_replace('/\ /', '-', $url_term);
               $url = preg_replace(array('/\$1/','/\$2/', '/\$3/', '/\$4/'), array($url_term1, $url_term2, $url_term3, $url_term4), $matcha[$match[1][$index]]);
-              $html = '<a href="' . $url .'" title="reference on '. $term .'" target="'. $target .'">'. $display_term .'</a>';
+              $html = '<a href="' . $url .'" title="reference on '. $display_term .'" target="'. $target .'">'. $display_term .'</a>';
               $text = str_replace($pattern_matched, $html, $text);
             }
             $index++;
