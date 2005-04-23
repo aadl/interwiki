@@ -198,7 +198,13 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $term = trim($match[2][$index]);
               $term_array = explode('|',$term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
-              $url_term = $display_prefix ? $term_array[0] : preg_replace('/\&/', '%26', $term_array[0]); // if the prefix is 'http', don't fix ampersands
+              $url_term = $term_array[0];
+              // if the prefix is 'http', don't fix ampersands
+			  if (!$display_prefix) {
+                $url_term = preg_replace('/\&#038;/', '%26', $url_term); 
+                $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
+                $url_term = preg_replace('/\&/', '%26', $url_term); 
+              }
               $url_term1 = preg_replace('/\ /', '_', $url_term);
               $url_term2 = preg_replace('/\ /', '+', $url_term);
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
@@ -230,7 +236,13 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $term = trim($match[1][$index]);
 			  $term_array = explode('|', $term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
-              $url_term = $display_prefix ? $term_array[0] : preg_replace('/\&/', '%26', $term_array[0]); // if the prefix is 'http', don't fix ampersands
+              $url_term = $term_array[0];
+              // if the prefix is 'http', don't fix ampersands
+			  if (!$display_prefix) {
+                $url_term = preg_replace('/\&#038;/', '%26', $url_term); 
+                $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
+                $url_term = preg_replace('/\&/', '%26', $url_term); 
+              }
               $url_term1 = preg_replace('/\ /', '_', $url_term);
               $url_term2 = preg_replace('/\ /', '+', $url_term);
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
