@@ -33,10 +33,10 @@ function interwiki_help($section) {
 				  "<li>To add or edit new interwiki links, use %interwikis.</li></ul>\n",
                   array(
 				     '%MediaWiki' => '<a href="http://wikipedia.sourceforge.net/">MediaWiki</a>', 
-				     '%settings' => l(t("administer &raquo; filters"), "admin/filters"), 
-				     '%modules' => l(t("administer &raquo; modules"), "admin/modules"), 
-                     '%access' => l(t("administer &raquo; users &raquo; configure &raquo; permissions"), "admin/user/configure/permission"),				  
-                     '%interwikis' => l(t("administer &raquo; interwiki"), "admin/interwiki")				  
+				     '%settings' => l(t("administer &raquo; filters"), "admin/filters", array(), NULL, NULL, FALSE, TRUE), 
+				     '%modules' => l(t("administer &raquo; modules"), "admin/modules", array(), NULL, NULL, FALSE, TRUE), 
+                     '%access' => l(t("administer &raquo; users &raquo; configure &raquo; permissions"), "admin/user/configure/permission", array(), NULL, NULL, FALSE, TRUE),				  
+                     '%interwikis' => l(t("administer &raquo; interwiki"), "admin/interwiki", array(), NULL, NULL, FALSE, TRUE)				  
 				  )) . 
 				  t("<h3>Included search prefixes</h3>".
 				  "<p>The \"interwiki\" table created via file interwiki.sql comes with a number of records already included that facilitate linking to articles or search results on the following websites:</p>\n".
