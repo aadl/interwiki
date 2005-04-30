@@ -52,7 +52,9 @@ function interwiki_help($section) {
 				  "<tr><td>whois</td><td>%whois, Internic's search tool for information about who owns a domain name</td></tr>".
 				  "<tr><td>opendir</td><td>the %opendir, a human-edited web search engine</td></tr></table>\n".
 				  "<p>In addition, it has entries that facilitate linking to URLs in general and to content on your own local site. For example, [http://www.somesite.org|Some Website] ".
-				  "produces <a href=\"http://www.somesite.org\">Some Website</a>, and [:node/5|my fifth posting] produces <a href=\"node/5\">my fifth posting</a>.",
+				  "produces <a href=\"http://www.somesite.org\">Some Website</a>, and [:node/5|my fifth posting] produces <a href=\"node/5\">my fifth posting</a>. If \"http:\" is used as ".
+				  "the prefix, you can use %settings to specify the space character instead of the vertical bar character as the \"URL terminator\" which separates the URL from its display text. ".
+				  "(This option emulates the syntax used to specify external URLs in Wikipedia articles. If emulating Wikipedia is not important on your site, you'll probably want to use the default vertical bar character.)</p>",
 				  array(
 				    '%w' => l('Wikipedia', 'http://www.wikipedia.org'),
 				    '%sw' => l('SourceWatch', 'http://www.sourcewatch.org'),
@@ -63,7 +65,8 @@ function interwiki_help($section) {
 				    '%th' => l('thesaurus', 'http://thesaurus.reference.com'),
 				    '%archive' => l('Wayback Machine', 'http://web.archive.org'),
 				    '%whois' => l('whois', 'http://www.internic.net/whois.html'),
-				    '%opendir' => l('Open Directory project', 'http://search.dmoz.org')
+				    '%opendir' => l('Open Directory project', 'http://search.dmoz.org'),
+				    '%settings' => l(t("administer &raquo; filters"), "admin/filters", array(), NULL, NULL, FALSE, TRUE), 
 					));
   }
 }
@@ -79,18 +82,6 @@ function interwiki_help($section) {
 function interwiki_perm() {
   return array('administer interwiki');
 }
-
-/**
- * Implementation of hook_settings().
- */
-/*
-function interwiki_settings() {
-  $syntax = array('single' => 'Single brackets, e.g., [prefix:some term]', 'double' => 'Double brackets, e.g., [[prefix:some term]]');
-  $output = form_checkboxes(t('Syntax'), 'interwiki_syntax', variable_get('interwiki_syntax', array('single')), $syntax, t('The syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)'));
-  $output .= form_textfield(t('Default prefix'), 'interwiki_default', variable_get('interwiki_default', 'w'), 10, 30, t('The prefix used by default with the double bracket syntax. For example, a default prefix of "w" means that [[some term]] is synonymous with [[w:some term]]. (This may be useful if you want to be able to cut-and-paste text from Wikipedia into your site.)'));
-  return $output;
-}
-*/
 
 /**
  * Implementation of hook_menu().
@@ -190,13 +181,15 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
             if (! ($matcha[$match[1][$index]] == "")) {
               // a prefix of 'http' is a special case where the prefix ought to display if no separate display term is specified
               if ($match[1][$index] == 'http') {
-                $display_prefix = $match[1][$index] . ':';
-              } else {
-                $display_prefix = '';
+			    $display_prefix = $match[1][$index] . ':';
+                $url_terminator = (variable_get("interwiki_terminator_$format", 'vert') == 'space') ? ' ' : '|';
+			  } else {
+			    $display_prefix = '';
+				$url_terminator = '|';
               }
               $target = $targets[$match[1][$index]];
               $term = trim($match[2][$index]);
-              $term_array = explode('|',$term, 2);
+              $term_array = explode($url_terminator, $term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
               $url_term = $term_array[0];
               // if the prefix is 'http', don't fix ampersands
@@ -210,7 +203,12 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
               $url_term4 = preg_replace('/\ /', '-', $url_term);
               $url = preg_replace(array('/\$1/','/\$2/', '/\$3/', '/\$4/'), array($url_term1, $url_term2, $url_term3, $url_term4), $matcha[$match[1][$index]]);
-              $html = '<a href="' . $url .'" title="reference on '. $display_term .'" target="'. $target .'">'. $display_term .'</a>';
+              // If it's an external path, don't use the l() function
+              if (preg_match("/^(http|https|mailto|ftp):/i", $url)) {
+                $html = '<a href="' . $url .'" title="reference on '. $display_term .'" target="'. $target .'">'. $display_term .'</a>';
+              } else {
+                $html = l($display_term, $url, array('title' => "reference on $display_term", 'target' => $target));
+              }
               $text = str_replace($pattern_matched, $html, $text);
             }
             $index++;
@@ -229,12 +227,14 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               // a prefix of 'http' is a special case where the prefix ought to display if no separate display term is specified
 			  if ($match_default == 'http') {
 			    $display_prefix = $match_default . ':';
+                $url_terminator = (variable_get("interwiki_terminator_$format", 'vert') == 'space') ? ' ' : '|';
 			  } else {
 			    $display_prefix = '';
+				$url_terminator = '|';
 			  }
               $target = $targets[$match_default];
               $term = trim($match[1][$index]);
-			  $term_array = explode('|', $term, 2);
+              $term_array = explode($url_terminator, $term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
               $url_term = $term_array[0];
               // if the prefix is 'http', don't fix ampersands
@@ -248,7 +248,12 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
               $url_term4 = preg_replace('/\ /', '-', $url_term);
               $url = preg_replace(array('/\$1/','/\$2/', '/\$3/', '/\$4/'), array($url_term1, $url_term2, $url_term3, $url_term4), $matcha[$match_default]);
-              $html = '<a href="' . $url .'" title="reference on '. $display_term .'" target="'. $target .'">'. $display_term .'</a>';
+              // If it's an external path, don't use the l() function
+              if (preg_match("/^(http|https|mailto|ftp):/i", $url)) {
+                $html = '<a href="' . $url .'" title="reference on '. $display_term .'" target="'. $target .'">'. $display_term .'</a>';
+              } else {
+                $html = l($display_term, $url, array('title' => "reference on $display_term", 'target' => $target));
+              }
               $text = str_replace($pattern_matched, $html, $text);
             }
             $index++;
@@ -279,7 +284,11 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
 
       $syntax = array('single' => 'Single brackets, e.g., [prefix:some term]', 'double' => 'Double brackets, e.g., [[prefix:some term]]');
       $output .= form_checkboxes(t('Syntax'), "interwiki_syntax_$format", variable_get("interwiki_syntax_$format", array('single')), $syntax, t('Check the boxes above to select the syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)'));
-      $output .= form_textfield(t('Default prefix'), 'interwiki_default_$format', variable_get('interwiki_default_$format', 'w'), 10, 30, t('The prefix used by default with the double bracket syntax. For example, a default prefix of "w" means that [[some term]] is synonymous with [[w:some term]]. (This may be useful if you want to be able to cut-and-paste text from Wikipedia into your site.)'));
+      $output .= form_textfield(t('Default prefix'), "interwiki_default_$format", variable_get("interwiki_default_$format", 'w'), 10, 30, t('The prefix used by default with the double bracket syntax. For example, a default prefix of "w" means that [[some term]] is synonymous with [[w:some term]]. (This may be useful if you want to be able to cut-and-paste text from Wikipedia into your site.)'));
+
+      $terminators = array('space' => t('Space character'), 'vert' => t('Vertical bar (|)'));
+      $output .= form_radios(t('URL terminator'), "interwiki_terminator_$format", variable_get("interwiki_terminator_$format", 'vert'), $terminators, t('The terminator character used to mark the end of a URL. For maximum compatibility with Wikipedia\'s syntax, choose "space." Otherwise, choose the vertical bar character (|).'));
+
       return form_group(t('interwiki'), $output);
 
     default:
