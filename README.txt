@@ -28,5 +28,10 @@ the following:
   whois       an Internic search for whois information about a domain name
   opendir     the Open Directory project (a human-edited web search engine)                                                                                                                                                                                                                                                                                                                                                        
 
+WARNING: The double-bracket syntax defined by this filter may conflict with
+a similar syntax used by freelinking.module. If you intend to use both modules
+together, make sure that you know how they are likely to interact or you may not
+get the results you expect. 
+
 Questions?
 Contact Aldon Hynes <ahynes1@optonline.net> or Sheldon Rampton <sheldon@prwatch.org>.
