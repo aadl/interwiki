@@ -31,7 +31,6 @@ INSERT INTO interwiki VALUES ('', '$1', 1);
 INSERT INTO interwiki VALUES ('ebay', 'http://search.ebay.com/$4', 0);
 INSERT INTO interwiki VALUES ('googledef', 'http://www.google.com/search?&q=define%3A$2', 0);
 INSERT INTO interwiki VALUES ('google', 'http://www.google.com/search?q=%22$2%22', 0);
-INSERT INTO interwiki VALUES ('dict', 'http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=$2', 0);
 INSERT INTO interwiki VALUES ('sw', 'http://www.sourcewatch.org/index.php?title=$1', 0);
 INSERT INTO interwiki VALUES ('th', 'http://thesaurus.reference.com/search?q=$3', 0);
 INSERT INTO interwiki VALUES ('archive', 'http://web.archive.org/web/*/http://$1', 0);
