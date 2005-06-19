@@ -220,7 +220,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       // Handle the default prefix
 	  if (!(array_search('double', $syntax) === FALSE)) {
         $preg = '/\[\[([^]]+)?\]\]/i';
-        $match_default = variable_get('interwiki_default_$format', 'w');
+        $match_default = variable_get("interwiki_default_$format", 'w');
         if (preg_match_all($preg, $text, $match)) {
           $index = 0;
           foreach($match[0] as $pattern_matched) {
