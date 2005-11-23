@@ -1,5 +1,3 @@
-$Id$
-
 This mini-module was made by Aldon Hynes (ahynes1@optonline.net).
 Additional modifications where made by Sheldon Rampton (sheldon@prwatch.org).
 It was based on the dkosfilter module by Josh Koenig <joshk@outlandishjosh.com>
