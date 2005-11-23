@@ -231,6 +231,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
                 $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
                 $url_term = preg_replace('/\&/', '%26', $url_term); 
               }
+              $display_term = preg_replace("/<[^>]*>/", "", $display_term); // strip out any HTML tags
               $url_term1 = preg_replace('/\ /', '_', $url_term);
               $url_term2 = preg_replace('/\ /', '+', $url_term);
               $url_term3 = preg_replace('/\ /', '%20', $url_term);
@@ -346,17 +347,22 @@ function interwiki_filter_tips($delta, $format, $long = false) {
     $unpiped = t('[[prefix:term]]');
     $piped   = t("[[$sample_prefix:public transport|public transportation]]");
   }
-  $trans_result = interwiki_filter('process', 0, $format, $piped);
-  return t('Easily link to terms in various wikis or other websites by typing %unpiped. ' . 
-      'Use the "|" character to create a "piped link," e.g., "%piped" '.
-      'displays as "%trans." '.
-      'For a full list of available prefixes and the websites to which they point, see %prefixes.',
-	  array(
-        '%unpiped' => $unpiped,
-        '%piped' => $piped,
-		'%trans' => $trans_result,
-        '%prefixes' => l('interwiki', "interwiki/$format")
-      ));
+ if ($long) {
+    return t('Easily link to terms in various wikis or other websites by typing %unpiped. ' . 
+        'Use the "|" character to create a "piped link," e.g., "%piped" '.
+        'displays as "<a href="http://en.wikipedia.org/wiki/public_transport">public transportation</a>." '.
+        'For a full list of available prefixes and the websites to which they point, see %prefixes.',
+        array(
+          '%unpiped' => $unpiped,
+          '%piped' => $piped,
+          '%prefixes' => l('interwiki', "interwiki/$format")
+        ));
+  } else {
+    return t('Easily link to terms in various wikis. For help, see %prefixes.',
+        array(
+          '%prefixes' => l('interwiki', "interwiki/$format")
+        ));
+  }
 }
 
 /**
@@ -389,9 +395,25 @@ function interwiki_form($edit = array()) {
  */
 function interwiki_save($edit) {
   db_query("DELETE FROM {interwiki} WHERE iw_prefix = '%s'", $edit["iw_prefix"]);
-  if ($edit["iw_url"]) {
+  if ($edit["action"] != 'delete') {
     db_query("INSERT INTO {interwiki} (iw_prefix, iw_url, iw_local) VALUES  ('%s', '%s', '%d')", $edit["iw_prefix"], $edit["iw_url"], $edit["iw_local"]);
   }
+}
+
+/**Confirm deletion of filter*/
+function _interwiki_confirm_del($edit=array()) {
+
+  $extra  = form_hidden('confirm', 1);
+  $extra .= form_hidden('iw_prefix', $edit['iw_prefix']);
+
+  $output = theme('confirm',
+                  t('Are you sure you want to delete the interwiki prefix %name?', array('%name' => theme('placeholder', $edit['iw_prefix']))),
+                  'admin/interwiki',
+                  t('This action cannot be undone.'),
+                  t('Delete'),
+                  t('Cancel'),
+                  $extra);
+  return $output;
 }
 
 /**
@@ -433,8 +455,14 @@ function interwiki_admin() {
 	  $edit = interwiki_get(arg(3));
       // fall through:
     case t("Delete"): // the upper-case "D" indicates that this came from the editing form, so there is a $_POST variable but no arg(3)
-      $edit["iw_url"] = '';
-      // fall through:
+      if (!$edit['confirm']) {
+	    $output = _interwiki_confirm_del($edit);
+        break;
+       }
+      else {
+        $edit['action'] = 'delete';
+        // fall through:
+      }
     case t("Submit"):
       $output = interwiki_save($edit);
       // fall through:
