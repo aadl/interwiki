@@ -6,6 +6,8 @@
  * An implementation of an input formatting module for a special non-html link  
  * syntax to wikis and other websites
  *
+ * Upgraded to Drupal 4.7, 5/13/2006
+ *
  * This module, when configured, is responsible for translating user-inputted links of the form
  * '[prefix:some term]' into the form '<a href="http://www.domain.com/some_term">some term</a>'
  * where prefix represents a key and http://www.domain.com/ is 
@@ -21,53 +23,53 @@ function interwiki_help($section) {
       return t('Easily link to wikis and other websites.');
     case 'admin/help#interwiki':
       return t("<p>This module makes it easy to link to wikis and other websites. Users avoid entering entire URLs, as they would for regular web pages, " .
-	              "and instead use a shorthand similar to the syntax used by %Wikipedia and other %MediaWiki sites, in which \"[prefix:some term]\" creates a hyperlink to the ".
-	              "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
-				  "different from the search term. For example, \"[w:public transport|public transportation]\" could be translated as a reference to the Wikipedia article on \"public ".
-				  "transport\" that displays as \"<a href=\"http://en.wikipedia.org/wiki/public_transport\">public transportation</a>.\" In addition to the single bracket syntax, ".
-				  "a double bracket syntax like the one used by %MediaWiki can be chosen from the interwiki configuration in %settings. The double-bracket syntax lets you specify a ".
-				  "\"default prefix\" that is used if no prefix is explicitly specified. For example, a default prefix of \"w\" means that [[some term]] is synonymous with [[w:some term]]. ".
-				  "This makes it easier to cut-and-paste text from MediaWiki sites directly into your Drupal site.</p>\n".
-                  "<h3>Configuration</h3><p>To use this module, you have to take a few steps:</p>".
-				  "<ul><li>Install and enable the module in %modules, and create the \"interwiki\" table using file interwiki.sql.</li>".
-				  "<li>Set the appropriate access right in %access<br />The access right is <b>administer interwiki</b>.</li>".
-				  "<li>To add or edit new interwiki links, use %interwikis.</li></ul>\n",
-                  array(
-				     '%Wikipedia' => '<a href="http://www.wikipedia.org">Wikipedia</a>',
-				     '%MediaWiki' => '<a href="http://wikipedia.sourceforge.net/">MediaWiki</a>', 
-				     '%settings' => l(t("administer &raquo; filters"), "admin/filters", array(), NULL, NULL, FALSE, TRUE), 
-				     '%modules' => l(t("administer &raquo; modules"), "admin/modules", array(), NULL, NULL, FALSE, TRUE), 
-                     '%access' => l(t("administer &raquo; users &raquo; configure &raquo; permissions"), "admin/user/configure/permission", array(), NULL, NULL, FALSE, TRUE),				  
-                     '%interwikis' => l(t("administer &raquo; interwiki"), "admin/interwiki", array(), NULL, NULL, FALSE, TRUE)				  
-				  )) . 
-				  t("<h3>Included search prefixes</h3>".
-				  "<p>The \"interwiki\" table created via file interwiki.sql comes with a number of records already included that facilitate linking to articles or search results on the following websites:</p>\n".
-				  "<table><tr><th>Prefix</th><th>Site</th></tr>\n".
-				  "<tr><td>w</td><td>%w, the online, open source encyclopedia</td></tr>".
-				  "<tr><td>sw</td><td>%sw, a wiki-based encyclopedia of lobbyists, PR firms, think tanks and other political advocacy groups</td></tr>".
-				  "<tr><td>kos</td><td>%kos, a wiki affiliated with the Daily Kos website</td></tr>".
-				  "<tr><td>ebay</td><td>%ebay</tr>".
-				  "<tr><td>google</td><td>%google, the online search engine</tr>".
-				  "<tr><td>th</td><td>an online %th</td></tr>".
-				  "<tr><td>archive</td><td>the %archive, also known as the Internet Archive, which stores and displays old versions of websites</td></tr>".
-				  "<tr><td>whois</td><td>%whois, Internic's search tool for information about who owns a domain name</td></tr>".
-				  "<tr><td>opendir</td><td>the %opendir, a human-edited web search engine</td></tr></table>\n".
-				  "<p>In addition, it has entries that facilitate linking to URLs in general and to content on your own local site. For example, [http://www.somesite.org|Some Website] ".
-				  "produces <a href=\"http://www.somesite.org\">Some Website</a>, and [:node/5|my fifth posting] produces <a href=\"node/5\">my fifth posting</a>. If \"http:\" is used as ".
-				  "the prefix, you can use %settings to specify the space character instead of the vertical bar character as the \"URL terminator\" which separates the URL from its display text. ".
-				  "(This option emulates the syntax used to specify external URLs in Wikipedia articles. If emulating Wikipedia is not important on your site, you'll probably want to use the default vertical bar character.)</p>",
-				  array(
-				    '%w' => l('Wikipedia', 'http://www.wikipedia.org'),
-				    '%sw' => l('SourceWatch', 'http://www.sourcewatch.org'),
-				    '%kos' => l('dKosopedia', 'http://www.dkosopedia.com'),
-				    '%ebay' => l('eBay', 'http://www.ebay.com'),
-				    '%google' => l('Google', 'http://www.google.com'),
-				    '%th' => l('thesaurus', 'http://thesaurus.reference.com'),
-				    '%archive' => l('Wayback Machine', 'http://web.archive.org'),
-				    '%whois' => l('whois', 'http://www.internic.net/whois.html'),
-				    '%opendir' => l('Open Directory project', 'http://search.dmoz.org'),
-				    '%settings' => l(t("administer &raquo; filters"), "admin/filters", array(), NULL, NULL, FALSE, TRUE), 
-					)) .
+          "and instead use a shorthand similar to the syntax used by %Wikipedia and other %MediaWiki sites, in which \"[prefix:some term]\" creates a hyperlink to the ".
+          "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
+          "different from the search term. For example, \"[w:public transport|public transportation]\" could be translated as a reference to the Wikipedia article on \"public ".
+          "transport\" that displays as \"<a href=\"http://en.wikipedia.org/wiki/public_transport\">public transportation</a>.\" In addition to the single bracket syntax, ".
+          "a double bracket syntax like the one used by %MediaWiki can be chosen from the interwiki configuration in %settings. The double-bracket syntax lets you specify a ".
+          "\"default prefix\" that is used if no prefix is explicitly specified. For example, a default prefix of \"w\" means that [[some term]] is synonymous with [[w:some term]]. ".
+          "This makes it easier to cut-and-paste text from MediaWiki sites directly into your Drupal site.</p>\n".
+        "<h3>Configuration</h3><p>To use this module, you have to take a few steps:</p>".
+          "<ul><li>Install and enable the module in %modules, and create the \"interwiki\" table using file interwiki.sql.</li>".
+          "<li>Set the appropriate access right in %access<br />The access right is <b>administer interwiki</b>.</li>".
+          "<li>To add or edit new interwiki links, use %interwikis.</li></ul>\n",
+            array(
+              '%Wikipedia' => '<a href="http://www.wikipedia.org">Wikipedia</a>',
+              '%MediaWiki' => '<a href="http://wikipedia.sourceforge.net/">MediaWiki</a>', 
+              '%settings' => l(t("administer &raquo; filters"), "admin/filters", array(), NULL, NULL, FALSE, TRUE), 
+              '%modules' => l(t("administer &raquo; modules"), "admin/modules", array(), NULL, NULL, FALSE, TRUE), 
+              '%access' => l(t("administer &raquo; access control"), "admin/access", array(), NULL, NULL, FALSE, TRUE),          
+              '%interwikis' => l(t("administer &raquo; interwiki"), "admin/interwiki", array(), NULL, NULL, FALSE, TRUE)          
+            )) . 
+          t("<h3>Included search prefixes</h3>".
+          "<p>The \"interwiki\" table created via file interwiki.sql comes with a number of records already included that facilitate linking to articles or search results on the following websites:</p>\n".
+          "<table><tr><th>Prefix</th><th>Site</th></tr>\n".
+          "<tr><td>w</td><td>%w, the online, open source encyclopedia</td></tr>".
+          "<tr><td>sw</td><td>%sw, a wiki-based encyclopedia of lobbyists, PR firms, think tanks and other political advocacy groups</td></tr>".
+          "<tr><td>kos</td><td>%kos, a wiki affiliated with the Daily Kos website</td></tr>".
+          "<tr><td>ebay</td><td>%ebay</tr>".
+          "<tr><td>google</td><td>%google, the online search engine</tr>".
+          "<tr><td>th</td><td>an online %th</td></tr>".
+          "<tr><td>archive</td><td>the %archive, also known as the Internet Archive, which stores and displays old versions of websites</td></tr>".
+          "<tr><td>whois</td><td>%whois, Internic's search tool for information about who owns a domain name</td></tr>".
+          "<tr><td>opendir</td><td>the %opendir, a human-edited web search engine</td></tr></table>\n".
+          "<p>In addition, it has entries that facilitate linking to URLs in general and to content on your own local site. For example, [http://www.somesite.org|Some Website] ".
+          "produces <a href=\"http://www.somesite.org\">Some Website</a>, and [:node/5|my fifth posting] produces <a href=\"node/5\">my fifth posting</a>. If \"http:\" is used as ".
+          "the prefix, you can use %settings to specify the space character instead of the vertical bar character as the \"URL terminator\" which separates the URL from its display text. ".
+          "(This option emulates the syntax used to specify external URLs in Wikipedia articles. If emulating Wikipedia is not important on your site, you'll probably want to use the default vertical bar character.)</p>",
+          array(
+            '%w' => l('Wikipedia', 'http://www.wikipedia.org'),
+            '%sw' => l('SourceWatch', 'http://www.sourcewatch.org'),
+            '%kos' => l('dKosopedia', 'http://www.dkosopedia.com'),
+            '%ebay' => l('eBay', 'http://www.ebay.com'),
+            '%google' => l('Google', 'http://www.google.com'),
+            '%th' => l('thesaurus', 'http://thesaurus.reference.com'),
+            '%archive' => l('Wayback Machine', 'http://web.archive.org'),
+            '%whois' => l('whois', 'http://www.internic.net/whois.html'),
+            '%opendir' => l('Open Directory project', 'http://search.dmoz.org'),
+            '%settings' => l(t("administer &raquo; filters"), "admin/filters", array(), NULL, NULL, FALSE, TRUE), 
+          )) .
                   t("<h3>For more information</h3>".
                   "<ul><li><a href = \"http://en.wikipedia.org/wiki/Interwiki Wikipedia\" title = \"wikipedia interwiki definition\">Wikipedia's interwiki definition</a>.</li>".
                   "<li>Configuration and customization handbook: <a href = \"http://drupal.org/handbook/modules/interwiki\" title = \"interwikipage\">interwiki page</a>.</li></ul>");
@@ -93,22 +95,22 @@ function interwiki_menu($may_cache) {
   $items = array();
   if ($may_cache) {
     $items[] = array('path' => 'interwiki',
-	  'title' => t('wiki filter prefixes'),
+      'title' => t('wiki filter prefixes'),
       'access' => TRUE,
       'callback' => 'interwiki_list',
       'type' => MENU_CALLBACK);
     $items[] = array('path' => 'admin/interwiki',
-	  'title' => t('interwiki'),
+      'title' => t('interwiki'),
       'access' => user_access('administer interwiki'),
       'callback' => 'interwiki_admin');
     $items[] = array('path' => 'admin/interwiki/list',
-	  'title' => t('list'),
+      'title' => t('list'),
       'access' => user_access('administer interwiki'),
       'callback' => 'interwiki_admin',
       'type' => MENU_DEFAULT_LOCAL_TASK,
-	  'weight' => -10 );
+      'weight' => -10 );
     $items[] = array('path' => 'admin/interwiki/add',
-	  'title' => t('add'),
+      'title' => t('add'),
       'access' => user_access('administer interwiki'),
       'callback' => 'interwiki_admin',
       'type' => MENU_LOCAL_TASK);
@@ -158,22 +160,22 @@ function interwiki_list() {
   }
   $trans_result = interwiki_filter('process', 0, $format, $piped);
   $output = t("<p>You can easily link to terms in wikis and various other websites using a simplified markup syntax. For example, \"%unpiped\" creates a hyperlink to the ".
-	              "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
-				  "different from the search term. For example, \"%piped\" would be translated as a reference to an article about \"public ".
-				  "transport\" that displays as \"%trans.\"</p>",
+                "\"some term\" article on the website specified by \"prefix.\" It is also possible to use the \"|\" character to create a \"piped link,\" with display text that is ".
+          "different from the search term. For example, \"%piped\" would be translated as a reference to an article about \"public ".
+          "transport\" that displays as \"%trans.\"</p>",
                   array(
-				     '%unpiped' => $unpiped, 
-				     '%piped' => $piped,
-					 '%trans' => $trans_result				  
-				  ));
+             '%unpiped' => $unpiped, 
+             '%piped' => $piped,
+           '%trans' => $trans_result          
+          ));
   $result = db_query("SELECT iw_prefix, iw_url from {interwiki}");
   $header = array(t('Prefix'), t('Translates to'));
   while ($record = db_fetch_object($result)) {
     // Strip out $1, $2, $3 and $4 from interwiki tables ...
     $url = preg_replace(array('/\$1/', '/\$2/', '/\$3/', '/\$4/'), '', $record->iw_url);
-	if ($url == '') {
-	  $url = t('<i>a local path on this website</i>');
-	}
+    if ($url == '') {
+      $url = t('<i>a local path on this website</i>');
+    }
     $rows[] = array ($record->iw_prefix . ":", $url);
   }
   $output .= t('Available prefixes are:') . '<p>';
@@ -213,11 +215,11 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
             if (! ($matcha[$match[1][$index]] == "")) {
               // a prefix of 'http' is a special case where the prefix ought to display if no separate display term is specified
               if ($match[1][$index] == 'http') {
-			    $display_prefix = $match[1][$index] . ':';
+          $display_prefix = $match[1][$index] . ':';
                 $url_terminator = (variable_get("interwiki_terminator_$format", 'vert') == 'space') ? ' ' : '|';
-			  } else {
-			    $display_prefix = '';
-				$url_terminator = '|';
+        } else {
+          $display_prefix = '';
+        $url_terminator = '|';
               }
               $target = $targets[$match[1][$index]];
               $term = trim($match[2][$index]);
@@ -225,7 +227,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
               $url_term = $term_array[0];
               // if the prefix is 'http', don't fix ampersands
-			  if (!$display_prefix) {
+        if (!$display_prefix) {
                 $display_term = preg_replace('/\&#038;/', '&', $display_term); 
                 $url_term = preg_replace('/\&#038;/', '%26', $url_term); 
                 $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
@@ -251,7 +253,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       }
 
       // Handle the default prefix
-	  if (!(array_search('double', $syntax) === FALSE)) {
+    if (!(array_search('double', $syntax) === FALSE)) {
         $preg = '/\[\[([^]]+)?\]\]/i';
         $match_default = variable_get("interwiki_default_$format", _interwiki_sample_prefix($format));
         if (preg_match_all($preg, $text, $match)) {
@@ -259,20 +261,20 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
           foreach($match[0] as $pattern_matched) {
             if (! ($matcha[$match_default] == "")) {
               // a prefix of 'http' is a special case where the prefix ought to display if no separate display term is specified
-			  if ($match_default == 'http') {
-			    $display_prefix = $match_default . ':';
+        if ($match_default == 'http') {
+          $display_prefix = $match_default . ':';
                 $url_terminator = (variable_get("interwiki_terminator_$format", 'vert') == 'space') ? ' ' : '|';
-			  } else {
-			    $display_prefix = '';
-				$url_terminator = '|';
-			  }
+        } else {
+          $display_prefix = '';
+        $url_terminator = '|';
+        }
               $target = $targets[$match_default];
               $term = trim($match[1][$index]);
               $term_array = explode($url_terminator, $term, 2);
               $display_term = $term_array[1] ? $term_array[1] : $display_prefix . $term;
               $url_term = $term_array[0];
               // if the prefix is 'http', don't fix ampersands
-			  if (!$display_prefix) {
+        if (!$display_prefix) {
                 $display_term = preg_replace('/\&#038;/', '&', $display_term); 
                 $url_term = preg_replace('/\&#038;/', '%26', $url_term); 
                 $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
@@ -299,6 +301,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       return $text; 
 
     case 'settings':
+      $form['interwiki'] = array('#type' => 'fieldset', '#title' => t('Interwiki setttings'), '#collapsible' => TRUE, '#collapsed' => TRUE);
       $sample_prefix = _interwiki_sample_prefix($format);
       $syntax = variable_get("interwiki_syntax_$format", array('single'));
       if ((array_search('double', $syntax) === FALSE) || !(array_search('single', $syntax) === FALSE)) {
@@ -313,22 +316,22 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
         'Use the "|" character to create a "piped link," e.g., "%piped" '.
         'displays as "%trans." '.
         'For a full list of available prefixes and the websites to which they point, see %prefixes.',
-	    array(
+      array(
           '%unpiped' => $unpiped,
           '%piped' => $piped,
-		  '%trans' => $trans_result,
+      '%trans' => $trans_result,
           '%prefixes' => l('interwiki', "interwiki/$format")
         ));
+      $form[interwiki]['intro'] = array('#type' => 'markup', '#value' => $output);
 
       $syntax = array('single' => 'Single brackets, e.g., [prefix:some term]', 'double' => 'Double brackets, e.g., [[prefix:some term]]');
-      $output .= form_checkboxes(t('Syntax'), "interwiki_syntax_$format", variable_get("interwiki_syntax_$format", array('single')), $syntax, t('Check the boxes above to select the syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)'));
-      $output .= form_textfield(t('Default prefix'), "interwiki_default_$format", variable_get("interwiki_default_$format", _interwiki_sample_prefix($format)), 10, 30, t("The prefix used by default with the double bracket syntax. For example, a default prefix of \"$sample_prefix\" means that [[some term]] is synonymous with [[$sample_prefix:some term]]. (This may be useful if you want to be able to cut-and-paste text from an existing wiki into your site.)"));
+      $form['interwiki']["interwiki_syntax_$format"] = array( '#type' => 'checkboxes', '#title' => t('Syntax'), '#default_value' => variable_get("interwiki_syntax_$format", array('single')), '#options' => $syntax, '#description' => t('Check the boxes above to select the syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)') );
+
+      $form['interwiki']["interwiki_default_$format"] = array( '#type' => 'textfield', '#title' => t('Default prefix'), '#default_value' => variable_get("interwiki_default_$format", _interwiki_sample_prefix($format)), '#size' => 10, '#maxlength' => 30, '#description' => t("The prefix used by default with the double bracket syntax. For example, a default prefix of \"$sample_prefix\" means that [[some term]] is synonymous with [[$sample_prefix:some term]]. (This may be useful if you want to be able to cut-and-paste text from an existing wiki into your site.)") );
 
       $terminators = array('space' => t('Space character'), 'vert' => t('Vertical bar (|)'));
-      $output .= form_radios(t('URL terminator'), "interwiki_terminator_$format", variable_get("interwiki_terminator_$format", 'vert'), $terminators, t('The terminator character used to mark the end of a URL. For maximum compatibility with Wikipedia\'s syntax, choose "space." Otherwise, choose the vertical bar character (|).'));
-
-      return form_group(t('interwiki'), $output);
-
+      $form['interwiki']["interwiki_terminator_$format"] = array( '#type' => 'radios', '#title' => t('URL terminator'), '#default_value' => variable_get("interwiki_terminator_$format", 'vert'), '#options' => $terminators, '#description' => t('The terminator character used to mark the end of a URL. For maximum compatibility with Wikipedia\'s syntax, choose "space." Otherwise, choose the vertical bar character (|).') );
+      return $form;
     default:
       return $text;
   }
@@ -377,16 +380,41 @@ function interwiki_get($iw_prefix) {
  *
  */
 function interwiki_form($edit = array()) {
-  $form .= form_textfield(t("Prefix"), "iw_prefix", $edit["iw_prefix"], 32, 32, t("The prefix goes before a colon when users edit content, e.g., \"[prefix:some text].\""));
-  $form .= form_textfield(t("URL"), "iw_url", $edit["iw_url"], 50, 128, t('The URL to be created. The phrase "some_text" will replace the string "$1" in the translated hyperlink, "some+text" will replace "$2", "some%20text" will replace "$3", and "some-text" will replace "$4".'));
-  $form .= form_checkbox(t("Local?"), "iw_local", 1, $edit["iw_local"], t("Is this link local to your website? Non-local links will open in a new window."));
-  $form .= form_submit(t("Submit"));
+  $form["iw_prefix"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Prefix"),
+    '#default_value' => $edit["iw_prefix"],
+    '#size' => 32,
+    '#maxlength' => 32,
+    '#description' => t("The prefix goes before a colon when users edit content, e.g., \"[prefix:some text].\""),
+  );
+  $form["iw_url"] = array(
+    '#type' => 'textfield',
+    '#title' => t("URL"),
+    '#default_value' => $edit["iw_url"],
+    '#size' => 50,
+    '#maxlength' => 128,
+    '#description' => t('The URL to be created. The phrase "some_text" will replace the string "$1" in the translated hyperlink, "some+text" will replace "$2", "some%20text" will replace "$3", and "some-text" will replace "$4".'),
+  );
+  $form["iw_local"] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Local?"),
+    '#return_value' => 1,
+    '#default_value' => $edit["iw_local"],
+    '#description' => t("Is this link local to your website? Non-local links will open in a new window."),
+  );
+  $form[] = array(
+    '#type' => 'submit',
+    '#value' => t("Submit"),
+  );
   
   if ($edit["iw_url"]) {
-    $form .= form_submit(t("Delete"));
+    $form[] = array(
+      '#type' => 'submit',
+      '#value' => t("Delete"),
+    );
   }
-  $form = form($form);
-  return $form;
+  return drupal_get_form('interwiki_add', $form);
 }
 
 /**
@@ -403,16 +431,16 @@ function interwiki_save($edit) {
 /**Confirm deletion of filter*/
 function _interwiki_confirm_del($edit=array()) {
 
-  $extra  = form_hidden('confirm', 1);
-  $extra .= form_hidden('iw_prefix', $edit['iw_prefix']);
+  $form['confirm'] = array(
+    '#type' => 'hidden',
+    '#value' => 1,
+  );
+  $form['iw_prefix'] = array(
+    '#type' => 'hidden',
+    '#value' => $edit['iw_prefix'],
+  );
 
-  $output = theme('confirm',
-                  t('Are you sure you want to delete the interwiki prefix %name?', array('%name' => theme('placeholder', $edit['iw_prefix']))),
-                  'admin/interwiki',
-                  t('This action cannot be undone.'),
-                  t('Delete'),
-                  t('Cancel'),
-                  $extra);
+  $output = confirm_form('interwiki_confirm_del', $form, t('Are you sure you want to delete the interwiki prefix %name?', array('%name' => theme('placeholder', $edit['iw_prefix']))), 'admin/interwiki', t('This action cannot be undone.'), t('Delete'), t('Cancel'));
   return $output;
 }
 
@@ -421,14 +449,22 @@ function _interwiki_confirm_del($edit=array()) {
  *
  */
 function interwiki_display() {
-  $output = t("<p>The interwiki table lets website users easily link to terms in wikis and various other websites using a simplified markup syntax. For example, \"[prefix:some term]\" creates a hyperlink to the ".
-	              "\"some term\" article on the website specified by \"prefix.\" Available prefixes and the paths to which they point are:</p>");
+  $output = '<p>' . t("The interwiki table lets website users easily link to terms in wikis and various other websites using a simplified markup syntax. For example, \"[prefix:some term]\" creates a hyperlink to the ".
+                "\"some term\" article on the website specified by \"prefix.\" Available prefixes and the paths to which they point are:") . '</p>';
   $result = db_query("SELECT iw_prefix, iw_url, iw_local from {interwiki}");
   $header = array(t('Prefix'), t('Translates to'), t('Local?'), array("data" => t("operations"), "colspan" => 2));
   while ($record = db_fetch_object($result)) {
     $rows[] = array ($record->iw_prefix . ":", $record->iw_url, ($record->iw_local ? 'Yes' : 'No'), l(t("edit"), "admin/interwiki/edit/$record->iw_prefix"), l(t("delete"), "admin/interwiki/delete/$record->iw_prefix"));
   }
   $output .= theme('table',$header,$rows);
+  $output .= '<p>' . t('The paths in the "translates to" row above use placeholder strings to specify how the space character should be ' .
+        'escaped in the URL generated by an interwiki translation. The placeholder strings are $1, $2, $3 and $4. They have the following effect:') . '</p>';
+  $output .= '<ul><li>$1 ' . t('replaces spaces with underscore characters (_)') .'</li>
+    <li>$2 ' . t('replaces spaces with plus signs (+)') .'</li>
+	<li>$3 ' . t('replaces spaces with "%20"') .'</li>
+	<li>$4 ' . t('replaces spaces with dashes (-)') .'</li></ul>';
+  $output .= '<p>' . t('Therefore, [w:ad hominem] uses the string "ad_hominem" in building the URL to Wikipedia\'s article on <a href="http://en.wikipedia.org/wiki/ad_hominem">ad hominem</a> arguments, '.
+       'while [th:ad hominem] uses the string "ad%20hominem" in building the URL to a thesaurus reference for the phrase <a href="http://thesaurus.reference.com/search?q=ad%20hominem">ad hominem</a>.') . '</p>';
   return $output;
 }
 
@@ -451,12 +487,12 @@ function interwiki_admin() {
     case "edit":
       $output = interwiki_form(interwiki_get(arg(3)));
       break;
-	case "delete": // the lower-case "d" in "delete" indicates that this came from a URL, so there's no $_POST variable and therefore no $edit
-	  $edit = interwiki_get(arg(3));
+  case "delete": // the lower-case "d" in "delete" indicates that this came from a URL, so there's no $_POST variable and therefore no $edit
+    $edit = interwiki_get(arg(3));
       // fall through:
     case t("Delete"): // the upper-case "D" indicates that this came from the editing form, so there is a $_POST variable but no arg(3)
       if (!$edit['confirm']) {
-	    $output = _interwiki_confirm_del($edit);
+      $output = _interwiki_confirm_del($edit);
         break;
        }
       else {
