@@ -9,8 +9,7 @@ reference to the Wikipedia article on "public transport" that displays as:
 == Configuration ==
 To use this module, you have to take a few steps:
 
-* Install and enable the module in admin/modules, and load the "interwiki" 
-  table using file interwiki.sql.
+* Install and enable the module in admin/modules.
 
 * Set the appropriate access right in admin/user/configure/permission. 
   The access right is "administer interwiki."
@@ -20,5 +19,5 @@ To use this module, you have to take a few steps:
 NOTE: The "interwiki" table used by this module has the same structure as the 
 interwiki table used by the MediaWiki software that powers Wikipedia and a number
 of other popular wikis. The Wikipedia community also maintains a lengthy prefix  
-that you can grab at:
+set that you can grab at:
 http://meta.wikimedia.org/wiki/Interwiki_map
