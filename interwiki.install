@@ -39,3 +39,8 @@ function interwiki_uninstall() {
   db_query('DROP TABLE {interwiki}');
 }
 
+function interwiki_update_1() {
+	$ret = array();
+	$ret[] = update_sql("ALTER TABLE {interwiki} ADD iw_rel char(32) NOT NULL default ''");
+  return $ret;
+}
