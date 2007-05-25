@@ -1,4 +1,4 @@
-<?php
+f<?php
 // $Id$
 
 /**
@@ -306,7 +306,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       return $text; 
 
     case 'settings':
-      $form['interwiki'] = array('#type' => 'fieldset', '#title' => t('Interwiki setttings'), '#collapsible' => TRUE, '#collapsed' => TRUE);
+      $form['interwiki'] = array('#type' => 'fieldset', '#title' => t('Interwiki settings'), '#collapsible' => TRUE, '#collapsed' => TRUE);
       $sample_prefix = _interwiki_sample_prefix($format);
       $syntax = variable_get("interwiki_syntax_$format", array('single'));
       if ((array_search('double', $syntax) === FALSE) || !(array_search('single', $syntax) === FALSE)) {
@@ -327,7 +327,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       '%trans' => $trans_result,
           '%prefixes' => l('interwiki', "interwiki/$format")
         ));
-      $form[interwiki]['intro'] = array('#type' => 'markup', '#value' => $output);
+      $form[interwiki]['intro'] = array('#type' => 'markup', '#value' => "<p>$output</p>");
 
       $syntax = array('single' => 'Single brackets, e.g., [prefix:some term]', 'double' => 'Double brackets, e.g., [[prefix:some term]]');
       $form['interwiki']["interwiki_syntax_$format"] = array( '#type' => 'checkboxes', '#title' => t('Syntax'), '#default_value' => variable_get("interwiki_syntax_$format", array('single')), '#options' => $syntax, '#description' => t('Check the boxes above to select the syntax(es) used to specify interwiki links. Single brackets are simpler, but double brackets are closer to the syntax used by <a href="http://wikipedia.sourceforge.net/">MediaWiki</a>, one of the most most popular wiki software packages. (If neither is checked, the filter defaults to single bracket syntax.)') );
