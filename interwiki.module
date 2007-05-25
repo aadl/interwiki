@@ -1,4 +1,4 @@
-f<?php
+<?php
 // $Id$
 
 /**
@@ -531,5 +531,3 @@ function interwiki_admin() {
 
   print theme('page', $output);
 }
-
-?>
