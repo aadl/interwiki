@@ -1,42 +1,71 @@
 <?php
 // $Id$
 
-function interwiki_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysqli':
-    case 'mysql':     
-      $result = db_query("
-        CREATE TABLE {interwiki} (
-          iw_prefix char(32) NOT NULL default '',
-          iw_url char(127) NOT NULL default '',
-          iw_local tinyint(1) NOT NULL default '0',
-          iw_rel char(32) NOT NULL default '',
-          UNIQUE KEY iw_prefix (iw_prefix)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
-      $result = _interwiki_insert('kos', 'http://www.dkosopedia.com/index.php/$1', 0);
-      $result = _interwiki_insert('w', 'http://en.wikipedia.org/wiki/$1', 0);
-      $result = _interwiki_insert('dis', 'http://www.sourcewatch.org/index.php?title=$1', 0);
-      $result = _interwiki_insert('http', 'http:$1', 0);
-      $result = _interwiki_insert('', '$1', 1);
-      $result = _interwiki_insert('ebay', 'http://search.ebay.com/$4', 0);
-      $result = _interwiki_insert('googledef', 'http://www.google.com/search?&q=define%3A$2', 0);
-      $result = _interwiki_insert('google', 'http://www.google.com/search?q=%22$2%22', 0);
-      $result = _interwiki_insert('sw', 'http://www.sourcewatch.org/index.php?title=$1', 0);
-      $result = _interwiki_insert('th', 'http://thesaurus.reference.com/search?q=$3', 0);
-      $result = _interwiki_insert('archive', 'http://web.archive.org/web/*/http://$1', 0);
-      $result = _interwiki_insert('whois', 'http://reports.internic.net/cgi/whois?whois_nic=$1&type=domain', 0);
-      $result = _interwiki_insert('opendir', 'http://search.dmoz.org/cgi-bin/search?search=$2', 0);
-      $result = _interwiki_insert('technorati', 'http://technorati.com/tag/$2', 0, 'tag');
-      break;
-  }
+function interwiki_schema() {
+  $schema['interwiki'] = array(
+    'description' => t('Base table for interwiki module'),
+    'fields' => array(
+      'iw_prefix' => array(
+        'description' => t('The interwiki prefix'),
+        'type' => 'char',
+        'length' => '32',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'iw_url' => array(
+        'description' => t('The interwiki URL'),
+        'type' => 'char',
+        'length' => '127',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'iw_local' => array(
+        'description' => t('Flag indicating whether this is a local or an external link'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'iw_rel' => array(
+        'description' => t('The interwiki rel field'),
+        'type' => 'char',
+        'length' => '32',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'unique keys' => array(
+      'iw_prefix' => array('iw_prefix')
+    ),
+  );
+  return $schema;
 }
 
 function _interwiki_insert($prefix,$url,$local,$rel='') {
   return db_query("INSERT INTO {interwiki} VALUES ('$prefix', '$url', $local, '$rel')");
 }
 
+function interwiki_install() {
+  drupal_install_schema('interwiki');
+  _interwiki_insert('kos', 'http://www.dkosopedia.com/index.php/$1', 0);
+  _interwiki_insert('w', 'http://en.wikipedia.org/wiki/$1', 0);
+  _interwiki_insert('dis', 'http://www.sourcewatch.org/index.php?title=$1', 0);
+  _interwiki_insert('http', 'http:$1', 0);
+  _interwiki_insert('', '$1', 1);
+  _interwiki_insert('ebay', 'http://search.ebay.com/$4', 0);
+  _interwiki_insert('googledef', 'http://www.google.com/search?&q=define%3A$2', 0);
+  _interwiki_insert('google', 'http://www.google.com/search?q=%22$2%22', 0);
+  _interwiki_insert('sw', 'http://www.sourcewatch.org/index.php?title=$1', 0);
+  _interwiki_insert('th', 'http://thesaurus.reference.com/search?q=$3', 0);
+  _interwiki_insert('archive', 'http://web.archive.org/web/*/http://$1', 0);
+  _interwiki_insert('whois', 'http://reports.internic.net/cgi/whois?whois_nic=$1&type=domain', 0);
+  _interwiki_insert('opendir', 'http://search.dmoz.org/cgi-bin/search?search=$2', 0);
+  _interwiki_insert('technorati', 'http://technorati.com/tag/$2', 0, 'tag');
+}
+
 function interwiki_uninstall() {
-  db_query('DROP TABLE {interwiki}');
+  drupal_uninstall_schema('interwiki');
+  db_query('DELETE FROM {filter} WHERE module = "interwiki"');
 }
 
 function interwiki_update_1() {
@@ -44,3 +73,4 @@ function interwiki_update_1() {
 	$ret[] = update_sql("ALTER TABLE {interwiki} ADD iw_rel char(32) NOT NULL default ''");
   return $ret;
 }
+
