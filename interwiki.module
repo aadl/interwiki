@@ -199,8 +199,12 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
         $matcha = $intwiki['matcha'];
         $targets = $intwiki['targets'];
         $rels = $intwiki['rels'];
-      }
-      else {
+      } else if(($cache = cache_get('interwiki_list')) && !empty($cache->data)) {
+        $intwiki = $cache->data;
+        $matcha = $intwiki['matcha'];
+        $targets = $intwiki['targets'];
+        $rels = $intwiki['rels'];
+      } else {
         $result = db_query("SELECT iw_prefix, iw_url, iw_local, iw_rel from {interwiki}");
         $targets = array();
         while ($record = db_fetch_object($result)) {
@@ -211,6 +215,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
         $intwiki['matcha'] = $matcha;
         $intwiki['targets'] = $targets;
         $intwiki['rels'] = $rels;
+        cache_set('interwiki_list', $intwiki, 'cache');
       }
       $syntax = variable_get("interwiki_syntax_$format", array('single'));
       if (!(array_search('double', $syntax) === FALSE)) {
