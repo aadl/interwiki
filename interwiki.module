@@ -186,6 +186,7 @@ function interwiki_list() {
  * Implementation of hook_filter().
  */
 function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
+  static $intwiki = array();
   switch ($op) {
     case 'list':
       return array(0 => t('Interwiki filter'));
@@ -194,12 +195,22 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       return t('Easily link to wikis and other reference websites'); 
 
     case 'process':
-      $result = db_query("SELECT iw_prefix, iw_url, iw_local, iw_rel from {interwiki}");
-      $targets = array();
-      while ($record = db_fetch_object($result)) {
-         $matcha[$record->iw_prefix] = $record->iw_url;
-         $targets[$record->iw_prefix] = $record->iw_local ? '_self' : '_blank';
-         $rels[$record->iw_prefix] = $record->iw_rel;
+      if(isset($intwiki['matcha'])){
+        $matcha = $intwiki['matcha'];
+        $targets = $intwiki['targets'];
+        $rels = $intwiki['rels'];
+      }
+      else {
+        $result = db_query("SELECT iw_prefix, iw_url, iw_local, iw_rel from {interwiki}");
+        $targets = array();
+        while ($record = db_fetch_object($result)) {
+          $matcha[$record->iw_prefix] = $record->iw_url;
+          $targets[$record->iw_prefix] = $record->iw_local ? '_self' : '_blank';
+          $rels[$record->iw_prefix] = $record->iw_rel;
+        }
+        $intwiki['matcha'] = $matcha;
+        $intwiki['targets'] = $targets;
+        $intwiki['rels'] = $rels;
       }
       $syntax = variable_get("interwiki_syntax_$format", array('single'));
       if (!(array_search('double', $syntax) === FALSE)) {
