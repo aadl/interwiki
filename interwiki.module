@@ -2,7 +2,7 @@
 
 /**
  * @file
- * An implementation of an input formatting module for a special non-html link  
+ * An implementation of an input formatting module for a special non-html link
  * syntax to wikis and other websites
  *
  * Upgraded to Drupal 4.7, 5/13/2006
@@ -11,7 +11,7 @@
  *
  * This module, when configured, is responsible for translating user-inputted links of the form
  * '[prefix:some term]' into the form '<a href="http://www.domain.com/some_term">some term</a>'
- * where prefix represents a key and http://www.domain.com/ is 
+ * where prefix represents a key and http://www.domain.com/ is
  * the path to the an article about the term
  */
 
@@ -35,12 +35,12 @@ function interwiki_help($section) {
           "<li>To add or edit new interwiki links, use !interwikis.</li></ul>\n",
             array(
               '!Wikipedia' => '<a href="http://www.wikipedia.org">Wikipedia</a>',
-              '!MediaWiki' => '<a href="http://wikipedia.sourceforge.net/">MediaWiki</a>', 
-              '!settings' => l(t("administer &raquo; filters"), "admin/settings/filters", array('html' => TRUE)), 
-              '!modules' => l(t("administer &raquo; modules"), "admin/build/modules", array('html' => TRUE)), 
-              '!access' => l(t("administer &raquo; access control"), "admin/user/permissions", array('html' => TRUE, 'fragment' => 'module-interwiki')),          
-              '!interwikis' => l(t("administer &raquo; interwiki"), "admin/settings/interwiki", array('html' => TRUE))          
-            )) . 
+              '!MediaWiki' => '<a href="http://wikipedia.sourceforge.net/">MediaWiki</a>',
+              '!settings' => l(t("administer &raquo; filters"), "admin/settings/filters", array('html' => TRUE)),
+              '!modules' => l(t("administer &raquo; modules"), "admin/build/modules", array('html' => TRUE)),
+              '!access' => l(t("administer &raquo; access control"), "admin/user/permissions", array('html' => TRUE, 'fragment' => 'module-interwiki')),
+              '!interwikis' => l(t("administer &raquo; interwiki"), "admin/settings/interwiki", array('html' => TRUE))
+            )) .
           t("<h3>Included search prefixes</h3>".
           "<p>The \"interwiki\" table created via file interwiki.sql comes with a number of records already included that facilitate linking to articles or search results on the following websites:</p>\n".
           "<table><tr><th>Prefix</th><th>Site</th></tr>\n".
@@ -67,7 +67,7 @@ function interwiki_help($section) {
             '!archive' => l('Wayback Machine', 'http://web.archive.org'),
             '!whois' => l('whois', 'http://www.internic.net/whois.html'),
             '!opendir' => l('Open Directory project', 'http://search.dmoz.org'),
-            '!settings' => l(t("administer &raquo; filters"), "admin/settings/filters", array('html' => TRUE)), 
+            '!settings' => l(t("administer &raquo; filters"), "admin/settings/filters", array('html' => TRUE)),
           )) .
                   t("<h3>For more information</h3>".
                   "<ul><li><a href = \"http://en.wikipedia.org/wiki/Interwiki Wikipedia\" title = \"wikipedia interwiki definition\">Wikipedia's interwiki definition</a>.</li>".
@@ -78,7 +78,7 @@ function interwiki_help($section) {
 
 /**
  * hook_perm: Define user permissions for module interwiki
- * 
+ *
  *   - access content: User can view the list of available filters
  *   - administer interwiki: User can edit or add to the list of filters
  *
@@ -121,10 +121,10 @@ function interwiki_menu() {
  * Return a prefix from the interwiki table. The prefix chosen
  * should be something other than "http" or the empty string "".
  * Preference is first given to the default prefix for the specified
- * format. If no format is specified, preference is given to 
+ * format. If no format is specified, preference is given to
  * prefixes that have a value of 1 for iw_local, and then to
  * the prefix "w" if it exists. (The "w" prefix for Wikipedia is included
- * in the standard interwiki table that ships with this module.) 
+ * in the standard interwiki table that ships with this module.)
  */
 function _interwiki_sample_prefix($format) {
   if ($format) {
@@ -163,7 +163,7 @@ function interwiki_list() {
           "different from the search term. For example, \"%piped\" would be translated as a reference to an article about \"public ".
           "transport\" that displays as \"!trans.\"</p>",
                   array(
-             '%unpiped' => $unpiped, 
+             '%unpiped' => $unpiped,
              '%piped' => $piped,
            '!trans' => $trans_result,
           ));
@@ -192,7 +192,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
       return array(0 => t('Interwiki filter'));
 
     case 'description':
-      return t('Easily link to wikis and other reference websites'); 
+      return t('Easily link to wikis and other reference websites');
 
     case 'process':
       if(isset($intwiki['matcha'])){
@@ -245,10 +245,10 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $url_term = $term_array[0];
               // if the prefix is 'http', don't fix ampersands
         if (!$display_prefix) {
-                $display_term = preg_replace('/\&#038;/', '&', $display_term); 
-                $url_term = preg_replace('/\&#038;/', '%26', $url_term); 
-                $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
-                $url_term = preg_replace('/\&/', '%26', $url_term); 
+                $display_term = preg_replace('/\&#038;/', '&', $display_term);
+                $url_term = preg_replace('/\&#038;/', '%26', $url_term);
+                $url_term = preg_replace('/\&amp;/', '%26', $url_term);
+                $url_term = preg_replace('/\&/', '%26', $url_term);
               }
               $display_term = preg_replace("/<[^>]*>/", "", $display_term); // strip out any HTML tags
               $url_term1 = preg_replace('/\ /', '_', $url_term);
@@ -260,7 +260,8 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               if (preg_match("/^(http|https|mailto|ftp):/i", $url)) {
                 $html = '<a href="' . $url .'" title="reference on '. $display_term . ($rel != "" ? ('" rel="' . $rel) : '') .'" target="'. $target .'">'. $display_term .'</a>';
               } else {
-                $html = l($display_term, $url, array('title' => "reference on $display_term", 'target' => $target));
+                $url = explode('?', $url);
+                $html = l($display_term, $url[0], array('title' => "reference on $display_term", 'target' => $target, 'query' => $url[1]));
               }
               $text = str_replace($pattern_matched, $html, $text);
             }
@@ -293,10 +294,10 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               $url_term = $term_array[0];
               // if the prefix is 'http', don't fix ampersands
         if (!$display_prefix) {
-                $display_term = preg_replace('/\&#038;/', '&', $display_term); 
-                $url_term = preg_replace('/\&#038;/', '%26', $url_term); 
-                $url_term = preg_replace('/\&amp;/', '%26', $url_term); 
-                $url_term = preg_replace('/\&/', '%26', $url_term); 
+                $display_term = preg_replace('/\&#038;/', '&', $display_term);
+                $url_term = preg_replace('/\&#038;/', '%26', $url_term);
+                $url_term = preg_replace('/\&amp;/', '%26', $url_term);
+                $url_term = preg_replace('/\&/', '%26', $url_term);
               }
               $url_term1 = preg_replace('/\ /', '_', $url_term);
               $url_term2 = preg_replace('/\ /', '+', $url_term);
@@ -307,7 +308,8 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
               if (preg_match("/^(http|https|mailto|ftp):/i", $url)) {
                 $html = '<a href="' . $url .'" title="reference on '. $display_term . ($rel != "" ? ('" rel="' . $rel) : '') .'" target="'. $target .'">'. $display_term .'</a>';
               } else {
-                $html = l($display_term, $url, array('title' => "reference on $display_term", 'target' => $target));
+                $url = explode('?', $url);
+                $html = l($display_term, $url[0], array('title' => "reference on $display_term", 'target' => $target, 'query' => $url[1]));
               }
               $text = str_replace($pattern_matched, $html, $text);
             }
@@ -316,7 +318,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
         }
       }
 
-      return $text; 
+      return $text;
 
     case 'settings':
       $form['interwiki'] = array(
@@ -335,7 +337,7 @@ function interwiki_filter($op, $delta = 0, $format = -1, $text = '') {
         $piped   = t("[[$sample_prefix:public transport|public transportation]]");
       }
       $trans_result = interwiki_filter('process', 0, $format, $piped);
-      $output = t('The interwiki filter is enabled. You can easily link to terms in various wikis or other websites by typing %unpiped. ' . 
+      $output = t('The interwiki filter is enabled. You can easily link to terms in various wikis or other websites by typing %unpiped. ' .
         'Use the "|" character to create a "piped link," e.g., "%piped" ' .
         'displays as "!trans." ' .
         'For a full list of available prefixes and the websites to which they point, see !prefixes.',
@@ -394,7 +396,7 @@ function interwiki_filter_tips($delta, $format, $long = false) {
     $piped   = t("[[$sample_prefix:public transport|public transportation]]");
   }
  if ($long) {
-    return t('Easily link to terms in various wikis or other websites by typing %unpiped. ' . 
+    return t('Easily link to terms in various wikis or other websites by typing %unpiped. ' .
       'Use the "|" character to create a "piped link," e.g., "%piped" '.
       'displays as "<a href="http://en.wikipedia.org/wiki/public_transport">public transportation</a>." '.
       'For a full list of available prefixes and the websites to which they point, see !prefixes.',
@@ -464,7 +466,7 @@ function interwiki_edit_form($form_state, $edit) {
     '#type' => 'submit',
     '#value' => t("Submit"),
   );
-  
+
   if ($edit["iw_url"]) {
     $form[] = array(
       '#type' => 'submit',
